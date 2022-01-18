@@ -200,7 +200,7 @@ void zakony(int j)
 		do
 		{
 			flag = false;
-			//universalni mezi
+			//law about universal boundaries
 			if(strstr(answers[j][y], "0*"))
 			{
 				cout<<"Using law about universal boundaries 0 * (A) = 0, we replace it\n";
@@ -251,7 +251,7 @@ void zakony(int j)
 				flag = true;
 				unite(j);
 			}
-			//neitralnist
+			//neutrality
 			if(strstr(answers[j][y], "0+"))
 			{
 				cout<<"Using neutrality 0 + (A) = (A), we replace it\n";
@@ -320,7 +320,7 @@ void zakony(int j)
 				flag = true;
 				unite(j);
 			}
-			//idempotentnist
+			//idempotence
 			for(char *ch = answers[j][y]; *ch; ch++)
 			{
 				if((*ch == '*') && (((isalpha(*(ch-1))) && (isalpha(*(ch+1))) && ((*(ch+2)) != '^') && (*(ch+1)==*(ch-1))) || ((isalpha(*(ch-2))) && (isalpha(*(ch+1))) && ((*(ch-1)) == '^') && ((*(ch+2)) == '^') &&(*(ch-2)==*(ch+1)))))
@@ -360,7 +360,7 @@ void zakony(int j)
 					unite(j);
 				}
 			}
-			//dopovnenist
+			//complementarity
 			for(char *q = answers[j][y]; *q; q++)
 			{
 				if((*q == '^') && (((*(q - 1) == *(q - 3)) && (isalpha(*(q - 1))) && (*(q - 2) == '*')) || ((*(q - 1) == *(q + 2)) && (isalpha(*(q - 1))) && (*(q + 1) == '*'))))
