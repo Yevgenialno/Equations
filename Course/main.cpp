@@ -45,7 +45,7 @@ void draw(HANDLE h, COORD c, int k, int n, int len)
 
 void getparts(int xx)
 {
-	int nskobok = 0;
+	int NumBrackets = 0;
 	char *p, *end1, *end2, mn1[level2], mn2[level2], op;
 	end1 = x[xx];
 	p = x[xx] + 1;
@@ -58,11 +58,11 @@ void getparts(int xx)
 	{
 		do
 		{
-			if(*end1 == '(')	nskobok++;
-			if(*end1 == ')')	nskobok--;
+			if(*end1 == '(')	NumBrackets++;
+			if(*end1 == ')')	NumBrackets--;
 			end1++;
 		}
-		while (nskobok);
+		while (NumBrackets);
 		end1--;
 		for (int i = 0; p != end1; p++, i++)
 		{
@@ -83,11 +83,11 @@ void getparts(int xx)
 	{
 		do
 		{
-			if(*end2 == '(')	nskobok++;
-			if(*end2 == ')')	nskobok--;
+			if(*end2 == '(')	NumBrackets++;
+			if(*end2 == ')')	NumBrackets--;
 			end2++;
 		}
-		while (nskobok);
+		while (NumBrackets);
 		end2--;
 		for (int i = 0; p != end2; p++, i++)
 		{
