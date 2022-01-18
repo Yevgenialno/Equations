@@ -1,0 +1,7 @@
+The course work is an example of software implementation of a universal method for solving a system of equations with one unknown in the algebra of sets.
+To implement the algorithm, a mathematical model of representation of the equation in the form of a ternary tree was used.
+The C ++ programming language was chosen to implement the method.
+The main menu interface was made using the "windows.h" library. and elements of pseudography.
+The product of the course work is intended for educational purposes.
+This product helps in the study of such a section of discrete mathematics as "set theory".
+The software product can be useful primarily for first-year students of technical specialties.
