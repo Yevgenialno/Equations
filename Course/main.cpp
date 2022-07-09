@@ -14,14 +14,14 @@
 #define KEY_ESC 27
 
 using namespace std;
-char *m[] = {"Add equation", "Solve system", "Clear", "Help", "Exit"};
-bool Globalvx = false, Globalvxd = false, flag = false;
+const char *m[] = {"Add equation", "Solve system", "Clear", "Help", "Exit"};
+bool is_X_there = false, is_addition_to_X_there = false, flag = false;
 HANDLE hstdout;
 int button, act = 0, nEquation = 0, thisEmptyMn = 0;
 const int level = 29524, level2 = 100, menu = 5;
-char x[level][level2], equations[5][level2], answers[5][3][50], globalAns[3][50], temp2[50], NulMn, EmptyMn[10];
+char input[level][level2], equations[5][level2], answers[5][3][50], globalAns[3][50], temp2[50], NulMn, EmptySets[10];
 
-void draw(HANDLE h, COORD c, int k, int n, int len)
+void draw_menu(HANDLE h, COORD c, int k, int n, int len)
 {
 	SetConsoleTextAttribute(h, ATTR1);
 	//system("cls");
@@ -43,112 +43,113 @@ void draw(HANDLE h, COORD c, int k, int n, int len)
 	std::cout<<m[k];
 }
 
-void getparts(int xx)
+void getparts(int equation_place)
 {
+	const char left_bracket = '(', right_bracket = ')';
 	int NumBrackets = 0;
-	char *p, *end1, *end2, mn1[level2], mn2[level2], op;
-	end1 = x[xx];
-	p = x[xx] + 1;
-	if(*end1 != '(')
+	char *p, *end1, *end2, set1[level2], set2[level2], operation;
+	end1 = input[equation_place];
+	p = input[equation_place] + 1;
+	if(*end1 != left_bracket)
 	{
-		mn1[0] = *end1;
-		mn1[1] = '\0';
+		set1[0] = *end1;
+		set1[1] = '\0';
 	}
 	else
 	{
 		do
 		{
-			if(*end1 == '(')	NumBrackets++;
-			if(*end1 == ')')	NumBrackets--;
+			if(*end1 == left_bracket)	NumBrackets++;
+			if(*end1 == right_bracket)	NumBrackets--;
 			end1++;
 		}
 		while (NumBrackets);
 		end1--;
 		for (int i = 0; p != end1; p++, i++)
 		{
-			mn1[i] = *p;
-			mn1[i + 1] = '\0';
+			set1[i] = *p;
+			set1[i + 1] = '\0';
 		}
 	}
-	op = *(end1 + 1);
+	operation = *(end1 + 1);
 	end2 = end1 + 2;
 	p = end2 + 1;
-	if(*end2 != '(')
+	if(*end2 != left_bracket)
 	{
-		mn2[0] = *end2;
-		mn2[1] = '\0';
+		set2[0] = *end2;
+		set2[1] = '\0';
 		end2+=2;
 	}
 	else
 	{
 		do
 		{
-			if(*end2 == '(')	NumBrackets++;
-			if(*end2 == ')')	NumBrackets--;
+			if(*end2 == left_bracket)	NumBrackets++;
+			if(*end2 == right_bracket)	NumBrackets--;
 			end2++;
 		}
 		while (NumBrackets);
 		end2--;
 		for (int i = 0; p != end2; p++, i++)
 		{
-			mn2[i] = *p;
-			mn2[i + 1] = '\0';
+			set2[i] = *p;
+			set2[i + 1] = '\0';
 		}
 	}
-	strcpy(x[3*xx+1], mn1);
-	x[3*xx+2][0] = op;
-	strcpy(x[3*xx+3], mn2);
+	strcpy(input[3*equation_place+1], set1);
+	input[3*equation_place+2][0] = operation;
+	strcpy(input[3*equation_place+3], set2);
 }
 
-void fill(int h)
+void fill_tree()
 {
 	for(int i = 1; i < level; i++)
 		for(int j = 0; j < level2; j++)
-			x[i][j] = '\0';
+			input[i][j] = '\0';
 	for(int i = 0; i <= level; i++)
 	{
-		if(strlen(x[i]) > 1)
+		if(strlen(input[i]) > 1)
 			getparts(i);
 	}
 }
 
-void connect(int i)
+void assemble_tree(int i)
 {
 	while(i != 0)
 	{
 		if(i%3 == 0) i-=2;
-		for(int k = 0; k <= strlen(x[i/3]); k++)
-			x[i/3][k] = '\0';
-		if(strlen(x[i]) > 1) strcat(x[i/3], "(");
-		strcat(x[i/3], x[i]);
-		if(strlen(x[i]) > 1) strcat(x[i/3], ")");
-		strcat(x[i/3], x[i+1]);
-		if(strlen(x[i+2]) > 1) strcat(x[i/3], "(");
-		strcat(x[i/3], x[i+2]);
-		if(strlen(x[i+2]) > 1) strcat(x[i/3], ")");
+		for(int k = 0; k <= strlen(input[i/3]); k++)
+			input[i/3][k] = '\0';
+		if(strlen(input[i]) > 1) strcat(input[i/3], "(");
+		strcat(input[i/3], input[i]);
+		if(strlen(input[i]) > 1) strcat(input[i/3], ")");
+		strcat(input[i/3], input[i+1]);
+		if(strlen(input[i+2]) > 1) strcat(input[i/3], "(");
+		strcat(input[i/3], input[i+2]);
+		if(strlen(input[i+2]) > 1) strcat(input[i/3], ")");
 		i=i/3;
 	}
 }
 
 void unite(int j)
 {
-	for(int t = 0; x[0][t] != '\0'; t++)
-		x[0][t] = '\0';
-	if(strlen(answers[j][0]) > 2) strcat(x[0], answers[j][0]);
+	for(int t = 0; input[0][t] != '\0'; t++)
+		input[0][t] = '\0';
+	if(strlen(answers[j][0]) > 2) strcat(input[0], answers[j][0]);
 	if(strlen(answers[j][1]) > 5)
-		strcat(x[0], answers[j][1]);
+		strcat(input[0], answers[j][1]);
 	else
-		if(Globalvx == true) 
-			if(strlen(answers[j][0]) > 2) strcat(x[0], "+X"); else strcat(x[0], "X");
+		if(is_X_there) 
+			if(strlen(answers[j][0]) > 2) strcat(input[0], "+X"); else strcat(input[0], "X");
 		if(strlen(answers[j][2]) > 6)
-			strcat(x[0], answers[j][2]);
+			strcat(input[0], answers[j][2]);
 		else
-			if(Globalvxd == true)
-				if((strlen(answers[j][0]) > 2)||(strlen(answers[j][2]) > 6)) strcat(x[0], "+X^"); else strcat(x[0], "X^");
-	std::cout<<x[0]<<"=0\n";
+			if(is_addition_to_X_there)
+				if((strlen(answers[j][0]) > 2)||(strlen(answers[j][2]) > 6)) strcat(input[0], "+X^"); else strcat(input[0], "X^");
+	std::cout<<input[0]<<"=0\n";
 }
 
-void zakony(int j)
+void laws(int j)
 {
 	for(int y = 0; y < 3; y++)
 	{
@@ -434,7 +435,7 @@ int main(int argc, char** argv)
 	label1:
 	SetConsoleTextAttribute(hstdout, ATTR1);
 	system("cls");
-	draw(hstdout, pos, act, menu, len);
+	draw_menu(hstdout, pos, act, menu, len);
 	while(true)
 	{
 		if(kbhit())
@@ -448,13 +449,13 @@ int main(int argc, char** argv)
 			if(button == 75)
 			{
 				act = (act - 1)%menu;
-				draw(hstdout, pos, act, menu, len);
+				draw_menu(hstdout, pos, act, menu, len);
 			}
 			
 			if(button == 77)
 			{
 				act = (act + 1)%menu;
-				draw(hstdout, pos, act, menu, len);
+				draw_menu(hstdout, pos, act, menu, len);
 			}
 			
 			if(button == 13)
@@ -493,13 +494,13 @@ int main(int argc, char** argv)
 								for(int u = 0; u < 50; u++)
 									globalAns[y][u] = '\0';
 						for(int y = 0; y < 10; y++)
-							EmptyMn[y] = '\0';
+							EmptySets[y] = '\0';
 						for(int j = 0; j < nEquation; j++)
 						{
 							for(int w = 0; w < level; w++)
 								for(int y = 0; y < level2; y++)
-									x[w][y] = '\0';
-							strcpy(x[0], equations[j]);
+									input[w][y] = '\0';
+							strcpy(input[0], equations[j]);
 							for(int y = 0; y < 3; y++)
 								for(int u = 0; u < 50; u++)
 									answers[j][y][u] = '\0';
@@ -514,9 +515,9 @@ int main(int argc, char** argv)
 							answers[j][2][3] = '*';
 							answers[j][2][4] = '(';
 							cout<<"Equation number "<<j+1<<":\n";
-							cout<<x[0]<<"\n";
+							cout<<input[0]<<"\n";
 							cout<<"Using the equivalence (A(X) = B(X)) <=> (A(X) & B(X) = 0), we transform the equation to equation, that has empty set in its right part\n";
-							p = &x[0][0];
+							p = &input[0][0];
 							temp[0] = '(';
 							for(l = 1; *p != '='; p++, l++)
 								temp[l] = *p;
@@ -532,294 +533,294 @@ int main(int argc, char** argv)
 							*(temp + l) = ')';
 							*(temp + l + 1) = '\0';
 							l = 1;
-							strcpy(x[0], temp);
-							cout<<x[0]<<"=0\n";
-							fill(j);
+							strcpy(input[0], temp);
+							cout<<input[0]<<"=0\n";
+							fill_tree();
 							cout<<"Using the definition of symmetric difference (A & B) = (A - B) + (B - A), we replace it\n";
 							for(long int i = 2; i < level - 3; i+=3) 
 							{
-								if(x[i][0] == '&') //ubiraem &
+								if(input[i][0] == '&') //ubiraem &
 								{
-									for(int k = 0; k <= strlen(x[i/3]); k++)
-										x[i/3][k] = '\0';
-									strcat(x[i/3], "(");
-									if(strlen(x[i-1]) > 1) strcat(x[i/3], "(");
-									strcat(x[i/3], x[i-1]);
-									if(strlen(x[i-1]) > 1) strcat(x[i/3], ")");
-									strcat(x[i/3], "-");
-									if(strlen(x[i+1]) > 1) strcat(x[i/3], "(");
-									strcat(x[i/3], x[i+1]);
-									if(strlen(x[i+1]) > 1) strcat(x[i/3], ")");
-									strcat(x[i/3], ")+(");
-									if(strlen(x[i+1]) > 1) strcat(x[i/3], "(");
-									strcat(x[i/3], x[i+1]);
-									if(strlen(x[i+1]) > 1) strcat(x[i/3], ")");
-									strcat(x[i/3], "-");
-									if(strlen(x[i-1]) > 1) strcat(x[i/3], "(");
-									strcat(x[i/3], x[i-1]);
-									if(strlen(x[i-1]) > 1) strcat(x[i/3], ")");
-									strcat(x[i/3], ")");
+									for(int k = 0; k <= strlen(input[i/3]); k++)
+										input[i/3][k] = '\0';
+									strcat(input[i/3], "(");
+									if(strlen(input[i-1]) > 1) strcat(input[i/3], "(");
+									strcat(input[i/3], input[i-1]);
+									if(strlen(input[i-1]) > 1) strcat(input[i/3], ")");
+									strcat(input[i/3], "-");
+									if(strlen(input[i+1]) > 1) strcat(input[i/3], "(");
+									strcat(input[i/3], input[i+1]);
+									if(strlen(input[i+1]) > 1) strcat(input[i/3], ")");
+									strcat(input[i/3], ")+(");
+									if(strlen(input[i+1]) > 1) strcat(input[i/3], "(");
+									strcat(input[i/3], input[i+1]);
+									if(strlen(input[i+1]) > 1) strcat(input[i/3], ")");
+									strcat(input[i/3], "-");
+									if(strlen(input[i-1]) > 1) strcat(input[i/3], "(");
+									strcat(input[i/3], input[i-1]);
+									if(strlen(input[i-1]) > 1) strcat(input[i/3], ")");
+									strcat(input[i/3], ")");
 									i=i/3;
-									connect(i);
+									assemble_tree(i);
 									i = 2;
-									std::cout<<x[0]<<"=0\n";
-									fill(j);
+									std::cout<<input[0]<<"=0\n";
+									fill_tree();
 								}
 							}
 							cout<<"Using the definition of difference (A - B) = (A * (B^)), we replace it\n";
 							for(long int i = 2; i < level - 3; i+=3) 
 							{
-								if(x[i][0] == '-') //ubiraem -
+								if(input[i][0] == '-') //ubiraem -
 								{
-									for(int k = 0; k <= strlen(x[i/3]); k++)
-										x[i/3][k] = '\0';
-									if(strlen(x[i-1]) > 1) strcat(x[i/3], "(");
-									strcat(x[i/3], x[i-1]);
-									if(strlen(x[i-1]) > 1) strcat(x[i/3], ")");
-									strcat(x[i/3], "*");
-									strcat(x[i/3], "(");
-									if(strlen(x[i+1]) > 1) strcat(x[i/3], "(");
-									strcat(x[i/3], x[i+1]);
-									if(strlen(x[i+1]) > 1) strcat(x[i/3], ")");
-									strcat(x[i/3], "^)");
+									for(int k = 0; k <= strlen(input[i/3]); k++)
+										input[i/3][k] = '\0';
+									if(strlen(input[i-1]) > 1) strcat(input[i/3], "(");
+									strcat(input[i/3], input[i-1]);
+									if(strlen(input[i-1]) > 1) strcat(input[i/3], ")");
+									strcat(input[i/3], "*");
+									strcat(input[i/3], "(");
+									if(strlen(input[i+1]) > 1) strcat(input[i/3], "(");
+									strcat(input[i/3], input[i+1]);
+									if(strlen(input[i+1]) > 1) strcat(input[i/3], ")");
+									strcat(input[i/3], "^)");
 									i=i/3;
-									connect(i);
+									assemble_tree(i);
 									i = 2;
-									std::cout<<x[0]<<"=0\n";
-									fill(j);
+									std::cout<<input[0]<<"=0\n";
+									fill_tree();
 								}
 							}
 							cout<<"Using de Morgan's law (A + B)^ = ((A^) * (B^)); (A * B)^ = ((A^) + (B^)) and involutiveness (A^)^ = A, we replace external additions\n";
 							for(long int i = 2; i < level - 3; i+=3) 
 							{
-								if((x[i][0] == '^') && (strlen(x[i-1]) > 1)) //ubiraem ()^
+								if((input[i][0] == '^') && (strlen(input[i-1]) > 1)) //ubiraem ()^
 								{
 									i--;
-									if(x[3*i+2][0] == '^')
+									if(input[3*i+2][0] == '^')
 									{
-										strcpy(x[i], x[3*i + 1]);
+										strcpy(input[i], input[3*i + 1]);
 									}
 									else
 									{
-										if(x[3*i+2][0] == '+') x[3*i+2][0] = '*';
-										else x[3*i+2][0] = '+';
-										x[i][0] = '\0';
-										strcat(x[i], "(");
-										if(strlen(x[3*i+1]) > 1) strcat(x[i], "(");
-										strcat(x[i], x[3*i+1]);
-										if(strlen(x[3*i+1]) > 1) strcat(x[i], ")");
-										strcat(x[i], "^");
-										strcat(x[i], ")");
-										strcat(x[i], x[3*i+2]);
-										strcat(x[i], "(");
-										if(strlen(x[3*i+3]) > 1) strcat(x[i], "(");
-										strcat(x[i], x[3*i+3]);
-										if(strlen(x[3*i+3]) > 1) strcat(x[i], ")");
-										strcat(x[i], "^");
-										strcat(x[i], ")");
+										if(input[3*i+2][0] == '+') input[3*i+2][0] = '*';
+										else input[3*i+2][0] = '+';
+										input[i][0] = '\0';
+										strcat(input[i], "(");
+										if(strlen(input[3*i+1]) > 1) strcat(input[i], "(");
+										strcat(input[i], input[3*i+1]);
+										if(strlen(input[3*i+1]) > 1) strcat(input[i], ")");
+										strcat(input[i], "^");
+										strcat(input[i], ")");
+										strcat(input[i], input[3*i+2]);
+										strcat(input[i], "(");
+										if(strlen(input[3*i+3]) > 1) strcat(input[i], "(");
+										strcat(input[i], input[3*i+3]);
+										if(strlen(input[3*i+3]) > 1) strcat(input[i], ")");
+										strcat(input[i], "^");
+										strcat(input[i], ")");
 									}
-									strcpy(x[i/3], x[i]);
+									strcpy(input[i/3], input[i]);
 									i = i/3;
-									connect(i);
+									assemble_tree(i);
 									i = 2;
-									std::cout<<x[0]<<"=0\n";
-									fill(j);
+									std::cout<<input[0]<<"=0\n";
+									fill_tree();
 								}
 							}
 							cout<<"using distributive law (A * (B + C)) = ((A * B) + (A * C)), we replace external intersections\n";
 							for(int i = 2; i <= (level-3)/3; i+=3) //ubiraem vneshnie peresecheniya
 							{
-								if((x[i][0] == '*')&&(x[3*(i-1)+2][0] == '+'))
+								if((input[i][0] == '*')&&(input[3*(i-1)+2][0] == '+'))
 								{
 									for(int k = 0; k < level2; k++)
-										x[i/3][k] = '\0';
-									strcat(x[i/3], "(");
-									if(strlen(x[i+1]) > 1) strcat(x[i/3], "(");
-									strcat(x[i/3], x[i+1]);
-									if(strlen(x[i+1]) > 1) strcat(x[i/3], ")");
-									strcat(x[i/3], "*");
-									if(strlen(x[3*i-2]) > 1) strcat(x[i/3], "(");
-									strcat(x[i/3], x[3*i-2]);
-									if(strlen(x[3*i-2]) > 1) strcat(x[i/3], ")");
-									strcat(x[i/3], ")");
-									strcat(x[i/3], "+");
-									strcat(x[i/3], "(");
-									if(strlen(x[i+1]) > 1) strcat(x[i/3], "(");
-									strcat(x[i/3], x[i+1]);
-									if(strlen(x[i+1]) > 1) strcat(x[i/3], ")");
-									strcat(x[i/3], "*");
-									if(strlen(x[3*i]) > 1) strcat(x[i/3], "(");
-									strcat(x[i/3], x[3*i]);
-									if(strlen(x[3*i]) > 1) strcat(x[i/3], ")");
-									strcat(x[i/3], ")");
+										input[i/3][k] = '\0';
+									strcat(input[i/3], "(");
+									if(strlen(input[i+1]) > 1) strcat(input[i/3], "(");
+									strcat(input[i/3], input[i+1]);
+									if(strlen(input[i+1]) > 1) strcat(input[i/3], ")");
+									strcat(input[i/3], "*");
+									if(strlen(input[3*i-2]) > 1) strcat(input[i/3], "(");
+									strcat(input[i/3], input[3*i-2]);
+									if(strlen(input[3*i-2]) > 1) strcat(input[i/3], ")");
+									strcat(input[i/3], ")");
+									strcat(input[i/3], "+");
+									strcat(input[i/3], "(");
+									if(strlen(input[i+1]) > 1) strcat(input[i/3], "(");
+									strcat(input[i/3], input[i+1]);
+									if(strlen(input[i+1]) > 1) strcat(input[i/3], ")");
+									strcat(input[i/3], "*");
+									if(strlen(input[3*i]) > 1) strcat(input[i/3], "(");
+									strcat(input[i/3], input[3*i]);
+									if(strlen(input[3*i]) > 1) strcat(input[i/3], ")");
+									strcat(input[i/3], ")");
 									i=i/3;
-									connect(i);
+									assemble_tree(i);
 									i = -1;
-									std::cout<<x[0]<<"=0\n";
-									fill(j);
+									std::cout<<input[0]<<"=0\n";
+									fill_tree();
 									continue;
 								}
-								if((x[i][0] == '*')&&(x[3*(i+1)+2][0] == '+'))
+								if((input[i][0] == '*')&&(input[3*(i+1)+2][0] == '+'))
 								{
 									for(int k = 0; k < level2; k++)
-										x[i/3][k] = '\0';
-									strcat(x[i/3], "(");
-									if(strlen(x[i-1]) > 1) strcat(x[i/3], "(");
-									strcat(x[i/3], x[i-1]);
-									if(strlen(x[i-1]) > 1) strcat(x[i/3], ")");
-									strcat(x[i/3], "*");
-									if(strlen(x[3*i+4]) > 1) strcat(x[i/3], "(");
-									strcat(x[i/3], x[3*i+4]);
-									if(strlen(x[3*i+4]) > 1) strcat(x[i/3], ")");
-									strcat(x[i/3], ")");
-									strcat(x[i/3], "+");
-									strcat(x[i/3], "(");
-									if(strlen(x[i-1]) > 1) strcat(x[i/3], "(");
-									strcat(x[i/3], x[i-1]);
-									if(strlen(x[i-1]) > 1) strcat(x[i/3], ")");
-									strcat(x[i/3], "*");
-									if(strlen(x[3*i + 6]) > 1) strcat(x[i/3], "(");
-									strcat(x[i/3], x[3*i + 6]);
-									if(strlen(x[3*i + 6]) > 1) strcat(x[i/3], ")");
-									strcat(x[i/3], ")");
+										input[i/3][k] = '\0';
+									strcat(input[i/3], "(");
+									if(strlen(input[i-1]) > 1) strcat(input[i/3], "(");
+									strcat(input[i/3], input[i-1]);
+									if(strlen(input[i-1]) > 1) strcat(input[i/3], ")");
+									strcat(input[i/3], "*");
+									if(strlen(input[3*i+4]) > 1) strcat(input[i/3], "(");
+									strcat(input[i/3], input[3*i+4]);
+									if(strlen(input[3*i+4]) > 1) strcat(input[i/3], ")");
+									strcat(input[i/3], ")");
+									strcat(input[i/3], "+");
+									strcat(input[i/3], "(");
+									if(strlen(input[i-1]) > 1) strcat(input[i/3], "(");
+									strcat(input[i/3], input[i-1]);
+									if(strlen(input[i-1]) > 1) strcat(input[i/3], ")");
+									strcat(input[i/3], "*");
+									if(strlen(input[3*i + 6]) > 1) strcat(input[i/3], "(");
+									strcat(input[i/3], input[3*i + 6]);
+									if(strlen(input[3*i + 6]) > 1) strcat(input[i/3], ")");
+									strcat(input[i/3], ")");
 									i=i/3;
-									connect(i);
+									assemble_tree(i);
 									i = -1;
-									std::cout<<x[0]<<"=0\n";
-									fill(j);
+									std::cout<<input[0]<<"=0\n";
+									fill_tree();
 									continue;
 								}
 							}
 							cout<<"Removing unnecessary brackets\n";
 							for(int t = 0; t < level2; t++)
-								x[1][t] = '\0';
-							x[1][0] = '(';
-							for(int t = 1, y = 0; x[0][y] != '\0'; y++)
+								input[1][t] = '\0';
+							input[1][0] = '(';
+							for(int t = 1, y = 0; input[0][y] != '\0'; y++)
 							{
-								if(x[0][y] != '+')
+								if(input[0][y] != '+')
 								{
-									if((x[0][y] != '(') && (x[0][y] != ')'))
+									if((input[0][y] != '(') && (input[0][y] != ')'))
 									{
-										x[1][t] = x[0][y];
+										input[1][t] = input[0][y];
 										t++;
 									}
 								}
 								else
 								{
-									x[1][t] = ')';
+									input[1][t] = ')';
 									t++;
-									x[1][t] = '+';
+									input[1][t] = '+';
 									t++;
-									x[1][t] = '(';
+									input[1][t] = '(';
 									t++;
 								}
 							}
-							x[1][strlen(x[1])] = ')';
-							strcpy(x[0], x[1]);
-							std::cout<<x[0]<<"=0\n";
+							input[1][strlen(input[1])] = ')';
+							strcpy(input[0], input[1]);
+							std::cout<<input[0]<<"=0\n";
 							cout<<"Grouping equation to form (A1) + X * (A2) + X^ * (A3)\n";
-							while(strstr(x[0], "X*X"))
+							while(strstr(input[0], "X*X"))
 							{
 								int u = 0, u2 = 0;
-								while(x[0][u])
+								while(input[0][u])
 								{
-									if((x[0][u] == 'X') && (x[0][u+1] == '*') && (x[0][u+2] == 'X'))
+									if((input[0][u] == 'X') && (input[0][u+1] == '*') && (input[0][u+2] == 'X'))
 										u+=2;
-									x[0][u2] = x[0][u];
+									input[0][u2] = input[0][u];
 									u++;
 									u2++;
 								}
-								x[0][u2] = '\0';
-								x[0][u2 + 1] = '\0';
-								x[0][u2 + 2] = '\0';
+								input[0][u2] = '\0';
+								input[0][u2 + 1] = '\0';
+								input[0][u2 + 2] = '\0';
 							}
-							while(strstr(x[0], "X^*X^"))
+							while(strstr(input[0], "X^*X^"))
 							{
 								int u = 0, u2 = 0;
-								while(x[0][u])
+								while(input[0][u])
 								{
-									if((x[0][u] == 'X') && (x[0][u+1] == '^') && (x[0][u+2] == '*') && (x[0][u+3] == 'X') && (x[0][u+4] == '^'))
+									if((input[0][u] == 'X') && (input[0][u+1] == '^') && (input[0][u+2] == '*') && (input[0][u+3] == 'X') && (input[0][u+4] == '^'))
 										u+=3;
-									x[0][u2] = x[0][u];
+									input[0][u2] = input[0][u];
 									u++;
 									u2++;
 								}
-								x[0][u2] = '\0';
-								x[0][u2 + 1] = '\0';
-								x[0][u2 + 2] = '\0';
-								x[0][u2 + 3] = '\0';
+								input[0][u2] = '\0';
+								input[0][u2 + 1] = '\0';
+								input[0][u2 + 2] = '\0';
+								input[0][u2 + 3] = '\0';
 							}
-							std::cout<<x[0]<<"=0\n";
-							x[2][0] = '\0';
-							for(int t = 0; t < strlen(x[0]); t++)
+							std::cout<<input[0]<<"=0\n";
+							input[2][0] = '\0';
+							for(int t = 0; t < strlen(input[0]); t++)
 							{
-								int poch = t, temp = t;
-								bool vx = false, vxd = false;
-								while((x[0][t] != '+') && (x[0][t] != '\0'))
+								int begining = t, temp = t;
+								bool is_X_here = false, is_addition_to_X_here = false;
+								while((input[0][t] != '+') && (input[0][t] != '\0'))
 								{
-									if((x[0][t] == 'X') && (x[0][t+1] != '^'))
-										{vx = true; Globalvx = true;}
-									if((x[0][t] == 'X') && (x[0][t+1] == '^'))
-										{vxd = true, Globalvxd = true;}
+									if((input[0][t] == 'X') && (input[0][t+1] != '^'))
+										{is_X_here = true; is_X_there = true;}
+									if((input[0][t] == 'X') && (input[0][t+1] == '^'))
+										{is_addition_to_X_here = true, is_addition_to_X_there = true;}
 									t++;
 								}
-								if((vx == true) && (vxd == true))
+								if((is_X_here == true) && (is_addition_to_X_here == true))
 								{
-									for(int cpy = t + 1; x[0][cpy] != '\0'; cpy++)
+									for(int cpy = t + 1; input[0][cpy] != '\0'; cpy++)
 									{
-										x[0][poch] = x[0][cpy];
-										poch++;
+										input[0][begining] = input[0][cpy];
+										begining++;
 									}
 									t = temp;
-									for(; poch < strlen(x[0]); poch++)
-										x[0][poch] = '\0';
-									std::cout<<x[0]<<"=0\n";
+									for(; begining < strlen(input[0]); begining++)
+										input[0][begining] = '\0';
+									std::cout<<input[0]<<"=0\n";
 								}
-								if((vx == false) && (vxd == false))
+								if((is_X_here == false) && (is_addition_to_X_here == false))
 								{
 									if(strlen(answers[j][0]) > 1)
 										answers[j][0][strlen(answers[j][0])] = '+';
-									while(poch <= t)
+									while(begining <= t)
 									{
-										if((x[0][poch] != '(') && (x[0][poch] != '+') && (x[0][poch] != ')'))
-											x[2][strlen(x[2])] = x[0][poch];
-										poch++;
+										if((input[0][begining] != '(') && (input[0][begining] != '+') && (input[0][begining] != ')'))
+											input[2][strlen(input[2])] = input[0][begining];
+										begining++;
 									}
-									strcat(answers[j][0], x[2]);
-									strcpy(temp2, x[2]);
-									for(int u = 0; x[2][u] != '\0'; u++) x[2][u] = '\0';
+									strcat(answers[j][0], input[2]);
+									strcpy(temp2, input[2]);
+									for(int u = 0; input[2][u] != '\0'; u++) input[2][u] = '\0';
 								}
-								if((vx == true) && (vxd == false))
+								if((is_X_here == true) && (is_addition_to_X_here == false))
 								{
 									if(strlen(answers[j][1]) > 4)
 										answers[j][1][strlen(answers[j][1])] = '+';
-									if(t - poch == 3)
-										x[2][0] = '1';
-									else while(poch <= t)
+									if(t - begining == 3)
+										input[2][0] = '1';
+									else while(begining <= t)
 									{
-										if((x[0][poch] != '(') && (x[0][poch] != '+') && (x[0][poch] != ')') && (x[0][poch] != 'X') && (x[0][poch + 1] != 'X') && ((x[0][poch - 1] != 'X') || (x[0][poch - 2] != '(')))
-											x[2][strlen(x[2])] = x[0][poch];
-										poch++;
+										if((input[0][begining] != '(') && (input[0][begining] != '+') && (input[0][begining] != ')') && (input[0][begining] != 'X') && (input[0][begining + 1] != 'X') && ((input[0][begining - 1] != 'X') || (input[0][begining - 2] != '(')))
+											input[2][strlen(input[2])] = input[0][begining];
+										begining++;
 									}
-									strcat(answers[j][1], x[2]);
-									strcpy(temp2, x[2]);
-									for(int u = 0; x[2][u] != '\0'; u++) x[2][u] = '\0';
+									strcat(answers[j][1], input[2]);
+									strcpy(temp2, input[2]);
+									for(int u = 0; input[2][u] != '\0'; u++) input[2][u] = '\0';
 								}
-								if((vx == false) && (vxd == true))
+								if((is_X_here == false) && (is_addition_to_X_here == true))
 								{
 									if(strlen(answers[j][2]) > 5)
 										answers[j][2][strlen(answers[j][2])] = '+';
-									if(t - poch == 4)
-										x[2][0] = '1';
-									else while(poch <= t)
+									if(t - begining == 4)
+										input[2][0] = '1';
+									else while(begining <= t)
 									{
-										if((x[0][poch] != '(') && (x[0][poch] != '+') && (x[0][poch] != ')') && ((x[0][poch + 1] != 'X') || (x[0][poch + 3] != ')')) && (x[0][poch - 2] != 'X') && (x[0][poch] != 'X') && (x[0][poch - 1] != 'X'))
-											x[2][strlen(x[2])] = x[0][poch];
-										poch++;
+										if((input[0][begining] != '(') && (input[0][begining] != '+') && (input[0][begining] != ')') && ((input[0][begining + 1] != 'X') || (input[0][begining + 3] != ')')) && (input[0][begining - 2] != 'X') && (input[0][begining] != 'X') && (input[0][begining - 1] != 'X'))
+											input[2][strlen(input[2])] = input[0][begining];
+										begining++;
 									}
-									strcat(answers[j][2], x[2]);
-									strcpy(temp2, x[2]);
-									for(int u = 0; x[2][u] != '\0'; u++) x[2][u] = '\0';
+									strcat(answers[j][2], input[2]);
+									strcpy(temp2, input[2]);
+									for(int u = 0; input[2][u] != '\0'; u++) input[2][u] = '\0';
 								}
 							}
 							answers[j][0][strlen(answers[j][0])] = ')';
@@ -827,7 +828,7 @@ int main(int argc, char** argv)
 							answers[j][2][strlen(answers[j][2])] = ')';
 							cout<<"Here we consider that the intersection is performed earlier than the union:\n";
 							unite(j);
-							zakony(j);
+							laws(j);
 							unite(j);
 							int jEmptyMn = thisEmptyMn;
 							for(char *p = answers[j][0]; *p; p++)
@@ -836,7 +837,7 @@ int main(int argc, char** argv)
 								{
 									NulMn = *p;
 									cout<<"In the bracket that does not contain X we see that "<<*p<<" is 0, so we can replace it\n";
-									if(!(strstr(EmptyMn, &NulMn))) EmptyMn[strlen(EmptyMn)] = NulMn;
+									if(!(strstr(EmptySets, &NulMn))) EmptySets[strlen(EmptySets)] = NulMn;
 									for(int y = 0; y < 3; y++)
 										for(char *p1 = answers[j][y]; *p1; p1++)
 											if(*p1 == NulMn) *p1 = '0';
@@ -849,7 +850,7 @@ int main(int argc, char** argv)
 											for(char *p1 = answers[u][y]; *p1; p1++)
 												if(*p1 == NulMn) *p1 = '0';
 										unite(u);
-										zakony(u);
+										laws(u);
 									}
 									cout<<"Also we can replace it in not solved equations:\n";
 									for(int u = j+1; u < nEquation; u++)
@@ -863,10 +864,10 @@ int main(int argc, char** argv)
 									}
 									cout<<"Returning to our equation:\n";
 									unite(j);
-									zakony(j);
+									laws(j);
 								}
 							}
-							Globalvx = false; Globalvxd = false;
+							is_X_there = false; is_addition_to_X_there = false;
 							cout<<"Answer to equation number"<<j+1<<":\n";
 							if(strlen(answers[j][0]) > 2) cout<<"If "<<answers[j][0]<<" = 0, than\n";
 							cout<<answers[j][2] + 4<<" < X < "<<answers[j][1] + 3<<"^.\nElse no solutions.\n\n";
@@ -893,7 +894,7 @@ int main(int argc, char** argv)
 							if(!(strlen(globalAns[1]))) globalAns[1][0] = '0';
 							if(!(strlen(globalAns[2]))) globalAns[2][0] = '0';
 							cout<<"Main solution:\nIf "<<globalAns[0]<<" = 0";
-							for(char *p = EmptyMn; *p; p++) cout<<" and "<<*p<<" = 0";
+							for(char *p = EmptySets; *p; p++) cout<<" and "<<*p<<" = 0";
 							cout<<", than\n"<<globalAns[2]<<" < X < ("<<globalAns[1]<<")^.\nElse no solutions.";
 						}
 						break;
@@ -903,9 +904,9 @@ int main(int argc, char** argv)
 					case 2:
 						for(int i = 1; i < 5; i++)
 							equations[i][0] = '\0';
-							x[0][0] = '\0';
+							input[0][0] = '\0';
 						nEquation = 0;
-						draw(hstdout, pos, act, menu, len);
+						draw_menu(hstdout, pos, act, menu, len);
 						goto label1;
 						break;
 					case 3:
