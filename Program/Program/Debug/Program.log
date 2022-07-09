@@ -1,0 +1,8 @@
+﻿  Program.cpp
+D:\RealProjects\Equations\Program\Program\Program.cpp(122,20): warning C4018: <=: несоответствие типов со знаком и без знака
+D:\RealProjects\Equations\Program\Program\Program.cpp(548,27): warning C4018: <=: несоответствие типов со знаком и без знака
+D:\RealProjects\Equations\Program\Program\Program.cpp(579,27): warning C4018: <=: несоответствие типов со знаком и без знака
+D:\RealProjects\Equations\Program\Program\Program.cpp(759,25): warning C4018: <: несоответствие типов со знаком и без знака
+D:\RealProjects\Equations\Program\Program\Program.cpp(779,25): warning C4018: <: несоответствие типов со знаком и без знака
+D:\RealProjects\Equations\Program\Program\Program.cpp(434,11): warning C4101: q: неиспользованная локальная переменная
+  Program.vcxproj -> D:\RealProjects\Equations\Program\Debug\Program.exe

@@ -1,0 +1,24 @@
+Legend:
++ is union;
+* is intersection;
+^ is an addition;
+- is the difference;
+& is a symmetrical difference;
+0 is Empty set;
+1 is Universal set;
+X is Unknown set;
+< is Contained in;
+> is Contains.
+
+Rules for entering equations:
+Brackets are placed in the standard way without neglecting them for the same operations: (A+B)+X=0;
+Sets, the length of which is more than one character, must be enclosed in parentheses, regardless of the operation: (A*B)+X=0;
+Sets, the length of which is one character must not be enclosed in parentheses: A+X=0;
+A set for which there is no external operation must not be enclosed in parentheses, regardless of its length: A*X=0;
+For complement to a set, one character length is not used parentheses: A^=X;
+In this case, for the resulting set, the brackets are used: (A^)+X=0;
+In more complex equations, put in parentheses each long set to which the operation is applied: (((A+X)*B)^)-(C^)=0;
+To designate known sets, use only capital letters of the English alphabet except X;
+To denote an unknown set, use only English X;
+The equation must contain symbol '=' exactly one time;
+Do not use spaces and other characters that are not indicated in the legend.
